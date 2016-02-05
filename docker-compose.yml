@@ -17,7 +17,7 @@ gocd-agent:
    - GO_SERVER=gocd-server
    - GO_SERVER_PORT=8153
 gocd-agent-jdk8:
-  build: gocd-agent/.
+  build: gocd-agent-jdk8/.
   links:
    - gocd-server
   environment:
@@ -26,7 +26,7 @@ gocd-agent-jdk8:
    - GO_SERVER=gocd-server
    - GO_SERVER_PORT=8153
 gocd-agent-nodejs:
-  build: gocd-agent/.
+  build: gocd-agent-nodejs/.
   links:
    - gocd-server
   environment:
@@ -35,7 +35,7 @@ gocd-agent-nodejs:
    - GO_SERVER=gocd-server
    - GO_SERVER_PORT=8153
 gocd-agent-cloudfoundry:
-  build: gocd-agent/.
+  build: gocd-agent-cloudfoundry/.
   links:
    - gocd-server
   environment:
