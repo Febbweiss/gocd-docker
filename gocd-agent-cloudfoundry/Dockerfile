@@ -1,7 +1,11 @@
 FROM debian
 
 RUN apt-get clean && apt-get update \
-    && apt-get install -y curl \
+    && apt-get install -y \
+       curl \
+       default-jre-headless \
+       git \
+       subversion \
     && apt-get clean \
     && rm -rf /var/lib/apt/listss/*
 
@@ -16,6 +20,8 @@ RUN cd /tmp \
     && curl -sL -o go-agent.deb "https://download.go.cd/gocd-deb/go-agent-15.2.0-2248.deb" \
     && dpkg -i -E go-agent.deb \
     && sed -i -e 's#GO_SERVER=127.0.0.1#GO_SERVER=gocd-server#' /etc/default/go-agent
+
+RUN git config --global url."https://".insteadOf git://
 
 #VOLUME ["/var/lib/go-agent", "/var/log/go-agent", "/var/go/.ssh"]
 

@@ -3,7 +3,7 @@ FROM debian
 RUN apt-get clean && apt-get update \
     && apt-get install -y \ 
        curl \
-       openjdk-7-jre-headless 
+       default-jre-headless 
 RUN apt-get clean && apt-get install -y \
        git \
        subversion
@@ -35,15 +35,13 @@ RUN cd /tmp \
     && sed -i -e "s/DAEMON=Y/DAEMON=N/" /etc/default/go-server \
     && sed -i -e 's#JAVA_HOME="/usr/lib/jvm/java-7-openjdk-amd64/jre"#JAVA_HOME="/opt/jdk1.8.0_66/jre"#' /etc/default/go-server
 
+RUN git config --global url."https://".insteadOf git://
+
 VOLUME ["/var/lib/go-server", "/var/log/go-server", "/etc/go", "/var/go/.ssh"]
 
 # Building CloudFoundry plugin
 RUN cd /tmp \
-    && git clone -b v2.0.0 https://github.com/Sounie/springer-gocd-cloudfoundry-plugin.git \
-    && cd springer-gocd-cloudfoundry-plugin \
-    && ./gradlew build \
-    && cp build/libs/springer-gocd-cloudfoundry-plugin*.jar /tmp/springer-gocd-cloudfoundry-plugin-2.0.1.jar \
-    && rm -rf /root/.gradle
+    && curl -sL -o springer-gocd-cloudfoundry-plugin-2.0.1.jar "https://github.com/Sounie/springer-gocd-cloudfoundry-plugin/releases/download/v2.0.0/springer-gocd-cloudfoundry-plugin-2.0.0.jar"
 
 # expose ports
 EXPOSE 8153 8154

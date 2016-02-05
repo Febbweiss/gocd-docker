@@ -1,7 +1,11 @@
 FROM debian
 
 RUN apt-get clean && apt-get update \
-    && apt-get install -y curl
+    && apt-get install -y \
+       curl \
+       default-jre-headless \
+       git \
+       subversion 
 RUN apt-get clean && apt-get install -y maven
 RUN apt-get clean && apt-get install -y gradle \
     && apt-get clean \
@@ -27,6 +31,8 @@ RUN cd /tmp \
     && dpkg -i -E go-agent.deb \
     && sed -i -e 's#GO_SERVER=127.0.0.1#GO_SERVER=gocd-server#' /etc/default/go-agent \
     && sed -i -e 's#JAVA_HOME="/usr/lib/jvm/java-7-openjdk-amd64/jre"#JAVA_HOME="/opt/jdk1.8.0_66/jre"#' /etc/default/go-agent
+
+RUN git config --global url."https://".insteadOf git://
 
 #VOLUME ["/var/lib/go-agent", "/var/log/go-agent", "/var/go/.ssh"]
 
