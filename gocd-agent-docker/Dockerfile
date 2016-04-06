@@ -1,23 +1,15 @@
-FROM alpine
+FROM docker
 
 ENV JAVA_HOME="/usr/lib/jvm/default-jvm"
 
 RUN apk update \
     && apk add --no-cache \
-       libc6-compat \
        curl \
        git \
        subversion \
        openjdk7-jre-base \
        bash \
     && ln -fs /bin/bash /bin/sh
-
-# Installing CloudFoundry
-RUN cd /usr/local/bin \
-    && curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&source=github" | tar -zx \
-    && mkdir /lib64 \
-    && ln -s /lib/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2 \
-    && cf add-plugin-repo bluemix-cf-staging http://plugins.ng.bluemix.net >/dev/null 2>&1
 
 # Installing Go agent
 WORKDIR /var/lib
@@ -26,9 +18,9 @@ RUN curl -sL -o go-agent-16.1.0.zip "https://download.go.cd/binaries/16.1.0-2855
     && mv go-agent-16.1.0 go-agent \
     && rm go-agent-16.1.0.zip
 
-RUN git config --global url."https://".insteadOf git://
-
 RUN rm -rf /tmp/* /var/tmp/* /var/cache/apk/*
+
+RUN git config --global url."https://".insteadOf git://
 
 #VOLUME ["/var/lib/go-agent", "/var/log/go-agent", "/var/go/.ssh"]
 

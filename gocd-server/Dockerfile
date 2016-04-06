@@ -9,8 +9,7 @@ RUN apt-get clean && apt-get install -y \
        subversion
 RUN apt-get clean && apt-get install -y maven
 RUN apt-get clean && apt-get install -y gradle \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean
 
 # Setting Java8 as default Java
 WORKDIR /opt
@@ -29,13 +28,15 @@ RUN update-alternatives --install /usr/bin/java java /opt/jdk1.8.0_66/bin/java 1
 
 # Installing Go server
 RUN cd /tmp \
-    && curl -sL -o go-server.deb "https://download.go.cd/gocd-deb/go-server-16.1.0-2855.deb" \
+    && curl -sL -o go-server.deb "https://download.go.cd/binaries/16.1.0-2855/deb/go-server-16.1.0-2855.deb" \
     && dpkg -i go-server.deb \
     && rm -f go-server.deb \
     && sed -i -e "s/DAEMON=Y/DAEMON=N/" /etc/default/go-server \
     && sed -i -e 's#JAVA_HOME="/usr/lib/jvm/java-7-openjdk-amd64/jre"#JAVA_HOME="/opt/jdk1.8.0_66/jre"#' /etc/default/go-server
 
 RUN git config --global url."https://".insteadOf git://
+
+RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 VOLUME ["/var/lib/go-server", "/var/log/go-server", "/etc/go", "/var/go/.ssh"]
 
