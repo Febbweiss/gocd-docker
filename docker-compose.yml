@@ -1,79 +1,101 @@
-gocd-server:
-  build: gocd-server/.
-  container_name: gocd-server
-  ports:
-   - "8153:8153"
-  volumes:
-   - ./mnt/var/lib/go-server:/var/lib/go-server
-   - ./mnt/etc/go:/etc/go
-   - ./mnt/var/log/go-server:/var/log/go-server
-  links:
-   - nexus
-  environment:
-   - AGENT_KEY=gocdkey
-gocd-agent:
-  build: gocd-agent/.
-  container_name: gocd-agent
-  links:
-   - gocd-server
-  environment:
-   - AGENT_KEY=gocdkey
-   - AGENT_RESOURCES=java,node,cf
-   - GO_SERVER=gocd-server
-   - GO_SERVER_PORT=8153
-gocd-agent-jdk8:
-  build: gocd-agent-jdk8/.
-  container_name: gocd-agent-jdk8
-  links:
-   - gocd-server
-  environment:
-   - AGENT_KEY=gocdkey
-   - AGENT_RESOURCES=java
-   - GO_SERVER=gocd-server
-   - GO_SERVER_PORT=8153
-gocd-agent-nodejs:
-  build: gocd-agent-nodejs/.
-  container_name: gocd-agent-nodejs
-  links:
-   - gocd-server
-  volumes:
-   - ./mnt/var/log:/var/log
-  environment:
-   - AGENT_KEY=gocdkey
-   - AGENT_RESOURCES=node
-   - GO_SERVER=gocd-server
-   - GO_SERVER_PORT=8153
-gocd-agent-cloudfoundry:
-  build: gocd-agent-cloudfoundry/.
-  container_name: gocd-agent-cf
-  links:
-   - gocd-server
-  environment:
-   - AGENT_KEY=gocdkey
-   - AGENT_RESOURCES=cf
-   - GO_SERVER=gocd-server
-   - GO_SERVER_PORT=8153
-gocd-agent-docker:
-  build: gocd-agent-docker/.
-  container_name: gocd-agent-docker
-  links:
-   - gocd-server
-  environment:
-   - AGENT_KEY=gocdkey
-   - AGENT_RESOURCES=docker
-   - GO_SERVER=gocd-server
-   - GO_SERVER_PORT=8153
-nexus:
-  image: sonatype/nexus
-  container_name: nexus
-  ports:
-   - "8081:8081"
-postfix:
-  image: juanluisbaptiste/postfix:latest
-  ports:
-   - "25:25"
-  environment:
-      SMTP_SERVER: smtp.mycompany.com
-      SMTP_USERNAME: user@mycompany.com
-      SMTP_PASSWORD: changeme
-      SERVER_HOSTNAME: helpdesk.mycompany.com
+version: '2'
+services:
+  gocd-server:
+    build:
+      context: gocd-server/.
+      args:
+        GO_SERVER_VERSION: 16.3.0
+        GO_SERVER_BUILD: 3183
+    container_name: gocd-server
+    ports:
+     - "8153:8153"
+    volumes:
+     - ./mnt/var/lib/go-server:/var/lib/go-server
+     - ./mnt/etc/go:/etc/go
+     - ./mnt/var/log/go-server:/var/log/go-server
+    links:
+     - nexus
+    environment:
+     - AGENT_KEY=gocdkey
+  gocd-agent:
+    build: gocd-agent/.
+    container_name: gocd-agent
+    links:
+     - gocd-server
+    environment:
+     - AGENT_KEY=gocdkey
+     - AGENT_RESOURCES=java,node,cf
+     - GO_SERVER=gocd-server
+     - GO_SERVER_PORT=8153
+  gocd-agent-jdk8:
+    build:
+      context: gocd-agent-jdk8/.
+      args:
+        GO_AGENT_VERSION: 16.3.0
+        GO_AGENT_BUILD: 3183
+    container_name: gocd-agent-jdk8
+    links:
+     - gocd-server
+    environment:
+     - AGENT_KEY=gocdkey
+     - AGENT_RESOURCES=java
+     - GO_SERVER=gocd-server
+     - GO_SERVER_PORT=8153
+  gocd-agent-nodejs:
+    build:
+      context: gocd-agent-nodejs/.
+      args:
+        GO_AGENT_VERSION: 16.3.0
+        GO_AGENT_BUILD: 3183
+    container_name: gocd-agent-nodejs
+    links:
+     - gocd-server
+    volumes:
+     - ./mnt/var/log:/var/log
+    environment:
+     - AGENT_KEY=gocdkey
+     - AGENT_RESOURCES=node
+     - GO_SERVER=gocd-server
+     - GO_SERVER_PORT=8153
+  gocd-agent-cloudfoundry:
+    build:
+      context: gocd-agent-cloudfoundry/.
+      args:
+        GO_AGENT_VERSION: 16.3.0
+        GO_AGENT_BUILD: 3183
+    container_name: gocd-agent-cf
+    links:
+     - gocd-server
+    environment:
+     - AGENT_KEY=gocdkey
+     - AGENT_RESOURCES=cf
+     - GO_SERVER=gocd-server
+     - GO_SERVER_PORT=8153
+  gocd-agent-docker:
+    build:
+      context: gocd-agent-docker/.
+      args:
+        GO_AGENT_VERSION: 16.3.0
+        GO_AGENT_BUILD: 3183
+    container_name: gocd-agent-docker
+    links:
+     - gocd-server
+    environment:
+     - AGENT_KEY=gocdkey
+     - AGENT_RESOURCES=docker
+     - GO_SERVER=gocd-server
+     - GO_SERVER_PORT=8153
+  nexus:
+    image: sonatype/nexus
+    container_name: nexus
+    ports:
+     - "8081:8081"
+  postfix:
+    image: juanluisbaptiste/postfix:latest
+    ports:
+     - "25:25"
+    environment:
+        SMTP_SERVER: smtp.mycompany.com
+        SMTP_USERNAME: user@mycompany.com
+        SMTP_PASSWORD: changeme
+        SERVER_HOSTNAME: helpdesk.mycompany.com

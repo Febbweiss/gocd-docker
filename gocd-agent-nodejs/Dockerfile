@@ -1,5 +1,8 @@
 FROM debian
 
+ARG GO_AGENT_VERSION=16.1.0
+ARG GO_AGENT_BUILD=2855
+
 RUN apt-get clean && apt-get update \
     && apt-get install -y \
        curl \
@@ -14,11 +17,12 @@ RUN curl -sL https://deb.nodesource.com/setup_5.x | bash -E - \
        build-essential \
        nodejs \
     && apt-get clean \
-    && rm -rf /var/lib/apt/listss/*
+    && rm -rf /var/lib/apt/listss/* \
+    && mkdir -p /data/db
 
 # Installing Go agent
 RUN cd /tmp \
-    && curl -sL -o go-agent.deb "https://download.go.cd/binaries/16.3.0-3183/deb/go-agent-16.3.0-3183.deb" \
+    && curl -sL -o go-agent.deb "https://download.go.cd/binaries/${GO_AGENT_VERSION}-${GO_AGENT_BUILD}/deb/go-agent-${GO_AGENT_VERSION}-${GO_AGENT_BUILD}.deb" \
     && dpkg -i -E go-agent.deb \
     && sed -i -e 's#GO_SERVER=127.0.0.1#GO_SERVER=gocd-server#' /etc/default/go-agent
 

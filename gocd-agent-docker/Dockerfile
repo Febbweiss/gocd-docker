@@ -1,5 +1,8 @@
 FROM docker
 
+ARG GO_AGENT_VERSION=16.1.0
+ARG GO_AGENT_BUILD=2855
+
 ENV JAVA_HOME="/usr/lib/jvm/default-jvm"
 
 RUN apk update \
@@ -13,10 +16,10 @@ RUN apk update \
 
 # Installing Go agent
 WORKDIR /var/lib
-RUN curl -sL -o go-agent-16.1.0.zip "https://download.go.cd/binaries/16.1.0-2855/generic/go-agent-16.1.0-2855.zip" \
-    && unzip go-agent-16.1.0.zip \
-    && mv go-agent-16.1.0 go-agent \
-    && rm go-agent-16.1.0.zip
+RUN curl -sL -o go-agent.zip "https://download.go.cd/binaries/${GO_AGENT_VERSION}-${GO_AGENT_BUILD}/generic/go-agent-${GO_AGENT_VERSION}-${GO_AGENT_BUILD}.zip" \
+    && unzip go-agent.zip \
+    && mv go-agent-${GO_AGENT_VERSION} go-agent \
+    && rm go-agent.zip
 
 RUN rm -rf /tmp/* /var/tmp/* /var/cache/apk/*
 
@@ -30,7 +33,6 @@ COPY autoregister.properties /var/lib/go-agent/config/autoregister.properties
 
 CMD until curl -s -o /dev/null "http://${GO_SERVER}:${GO_SERVER_PORT}"; do sleep 5; done; \
     if [ -n "$AGENT_KEY" ]; then \
-        sed -i -e 's/=.*/=/g' -e "s/key=/key=$AGENT_KEY/" -e "s/resources=/resources=$AGENT_RESOURCES/" /var/lib/go-agent/config/autoregister.properties; \ 
+        sed -i -e 's/=.*/=/g' -e "s/key=/key=$AGENT_KEY/" -e "s/resources=/resources=$AGENT_RESOURCES/" /var/lib/go-agent/config/autoregister.properties; \
     fi; \
-    (/var/lib/go-agent/agent.sh &); while [ ! -f /var/lib/go-agent/go-agent-bootstrapper.log ]; do sleep 1; done; exec tail -F /var/lib/go-agent/*.log
-
+    (/var/lib/go-agent/agent.sh &); (/usr/local/bin/docker daemon -p /var/run/docker-ssd.pid &);while [ ! -f /var/lib/go-agent/go-agent-bootstrapper.log ]; do sleep 1; done; exec tail -F /var/lib/go-agent/*.log
